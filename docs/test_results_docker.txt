@@ -1,0 +1,43 @@
+Target: http://127.0.0.1:8000
+
+[1] RAG #1 - kebijakan cuti  PASS  (4.5s)
+    query    : 'Berapa jatah cuti tahunan saya sebagai karyawan tetap?'
+    expected : faq
+    HTTP 200 -> {"status": "success", "intent": "faq", "data": "Sebagai karyawan tetap, Anda mendapat jatah 12 hari cuti tahunan. Jatah cuti tersebut dapat diambil setelah Anda melewati masa kerja minimal 3 bulan."}
+
+[2] RAG #2 - reset password VPN  PASS  (5.1s)
+    query    : 'Gimana cara reset password VPN kantor?'
+    expected : faq
+    HTTP 200 -> {"status": "success", "intent": "faq", "data": "Reset password VPN dapat dilakukan secara mandiri melalui portal self-service IT. Selain itu, Anda juga dapat menghubungi tim IT Support jika akun Anda terkunci."}
+
+[3] Tool #1 - tiket ada  PASS  (0.0s)
+    query    : 'Tolong cek status tiket TICKET-0005 saya dong'
+    expected : ticket_status
+    HTTP 200 -> {"status": "success", "intent": "ticket_status", "data": "Tiket TICKET-0005 (Access): Reset password VPN gagal terus. Status: Diproses. Terakhir diperbarui: 2026-08-27. Pemohon: Dedi Kurniawan."}
+
+[4] Tool #2 - tiket tidak ada  PASS  (0.0s)
+    query    : 'Apa status tiket TICKET0042 saya?'
+    expected : ticket_status
+    HTTP 200 -> {"status": "not_found", "intent": "ticket_status", "data": "Tiket TICKET-0042 tidak ditemukan di sistem. Mohon periksa kembali nomor tiket Anda atau hubungi tim IT Support."}
+
+[5] Ambigu / di luar cakupan  PASS  (0.9s)
+    query    : 'Bagaimana cuaca di Jakarta hari ini?'
+    expected : unknown
+    HTTP 200 -> {"status": "error", "intent": "unknown", "data": "Maaf, saya tidak memahami permintaan Anda atau permintaan tersebut di luar cakupan IT Helpdesk. Saya dapat membantu pertanyaan seputar kebijakan IT/HR (cuti, akses, password, perangkat, dll.) atau pengecekan status tiket (contoh: 'cek status TICKET-0005')."}
+
+[6] Tambahan - tiket tanpa ID  PASS  (0.0s)
+    query    : 'Tiket saya sudah sampai mana ya statusnya?'
+    expected : ticket_status
+    HTTP 200 -> {"status": "missing_ticket_id", "intent": "ticket_status", "data": "Nomor tiket tidak ditemukan pada pesan Anda. Mohon sertakan nomor tiket dengan format TICKET-XXXX (contoh: TICKET-0005)."}
+
+[7] Tambahan - FAQ tidak ada di KB  PASS  (5.1s)
+    query    : 'Apakah kantor menyediakan fasilitas gym?'
+    expected : faq
+    HTTP 200 -> {"status": "success", "intent": "faq", "data": "Maaf, informasi tersebut tidak tersedia di knowledge base. Silakan hubungi tim IT Support atau HR."}
+
+[8] Tambahan - query kosong  PASS  (0.0s)
+    query    : '   '
+    expected : unknown
+    HTTP 422 -> {"status": "error", "intent": "unknown", "data": "Query tidak boleh kosong."}
+
+Routing benar: 8/8
