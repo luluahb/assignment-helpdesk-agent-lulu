@@ -50,35 +50,41 @@ Tim People & IT Operations menerima ratusan pertanyaan repetitif setiap hari. Tu
 ## 2. Desain Workflow
 
 ```mermaid
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, Helvetica, sans-serif", "fontSize": "14px", "primaryColor": "#ffffff", "primaryTextColor": "#222222", "primaryBorderColor": "#555555", "lineColor": "#555555", "secondaryColor": "#ffffff", "tertiaryColor": "#f2f2f2", "clusterBkg": "#f2f2f2", "clusterBorder": "#bdbdbd", "edgeLabelBackground": "#ffffff"}}}%%
 flowchart TD
-    A([Client: POST /ask]) --> V{Query valid?}
-    V -- kosong / format salah --> E422[[422 · status=error]]
-    V -- ya --> R
+    A[POST /ask] --> B{Query valid?}
+    B -- Tidak --> E1[Error 422]
+    B -- Ya --> R1
 
-    subgraph R [Router · app/router.py]
-        R1{1. Rule: ada ticket ID?<br/>regex TICKET-xxxx} -- ya --> T
-        R1 -- tidak --> R2{2. Keyword:<br/>kata cek + kata tiket?}
-        R2 -- ya --> T
-        R2 -- tidak --> R3{3. LLM classifier<br/>Gemini, temp=0}
-        R3 -- ticket_status --> T
-        R3 -- faq --> F
-        R3 -- LLM gagal --> F
-        R3 -- unknown --> U
+    subgraph RT [Router]
+        R1{Ada ticket ID?}
+        R2{Keyword cek tiket?}
+        R3{LLM classifier}
+        R1 -- Tidak --> R2
+        R2 -- Tidak --> R3
     end
 
-    T[Tool call path · app/tools.py<br/>extract_ticket_id → lookup CSV]
-    T --> T1{Ditemukan?}
-    T1 -- ya --> S1[[status=success]]
-    T1 -- tidak --> S2[[status=not_found / missing_ticket_id]]
+    R1 -- Ya --> T1
+    R2 -- Ya --> T1
+    R3 -- ticket_status --> T1
+    R3 -- faq --> F1
+    R3 -- unknown --> U[Pesan di luar cakupan]
 
-    F[RAG path · app/rag.py<br/>embed query → FAISS top-3]
-    F --> F1{Skor cosine ≥ 0.65?}
-    F1 -- tidak --> S3[[Tidak tahu · tanpa panggil LLM]]
-    F1 -- ya --> F2[Prompt Persona/Task/Context/Format<br/>→ Gemini LLM]
-    F2 --> S4[[status=success]]
-    F2 -- LLM gagal --> E503[[503 · status=error]]
+    subgraph TC [Tool Call]
+        T1[Ekstrak ticket ID] --> T2[Lookup mock_tickets.csv]
+    end
 
-    U[[status=error · intent=unknown<br/>pesan di luar cakupan]]
+    subgraph RG [RAG]
+        F1[Embedding query] --> F2[FAISS top-3]
+        F2 --> F3{Skor >= 0.65?}
+        F3 -- Ya --> F4[Prompt + Gemini LLM]
+    end
+
+    F3 -- Tidak --> N[Jawaban: info tidak tersedia]
+    T2 --> Z[Response JSON: status, intent, data]
+    F4 --> Z
+    N --> Z
+    U --> Z
 ```
 
 **Ringkasnya:** `query → validasi → intent detection (rule → keyword → LLM) → RAG atau tool call → response {status, intent, data}`.
