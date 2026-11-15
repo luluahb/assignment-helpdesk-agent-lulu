@@ -100,16 +100,16 @@
     <!-- Edge labels -->
     <g font-size="13">
       <text x="560" y="122">Tidak</text>
-      <text x="458" y="195">Ya</text>
+      <text x="458" y="182">Ya</text>
       <text x="458" y="294">Tidak</text>
       <text x="458" y="384">Tidak</text>
       <text x="560" y="238">Ya</text>
       <text x="560" y="328">Ya</text>
       <text x="553" y="418">ticket_status</text>
       <text x="240" y="418">faq</text>
-      <text x="458" y="488">unknown</text>
+      <text x="458" y="500">unknown</text>
       <text x="158" y="750">Ya</text>
-      <text x="262" y="688">Tidak</text>
+      <text x="274" y="688">Tidak</text>
     </g>
   </g>
 </svg>
