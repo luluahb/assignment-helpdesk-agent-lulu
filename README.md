@@ -49,48 +49,9 @@ Tim People & IT Operations menerima ratusan pertanyaan repetitif setiap hari. Tu
 
 ## 2. Desain Workflow
 
-```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontSize": "14px", "primaryColor": "#ffffff", "primaryTextColor": "#000000", "primaryBorderColor": "#000000", "lineColor": "#000000", "secondaryColor": "#ffffff", "tertiaryColor": "#f2f2f2", "clusterBkg": "#f2f2f2", "clusterBorder": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".node rect, .node polygon, .cluster rect { filter: none !important; } .edgeLabel { padding: 0 4px; }"}}%%
-flowchart TD
-    A[POST /ask] --> B{Query valid?}
-    B -- Tidak --> E1[Error 422]
-    B -- Ya --> R1
-
-    subgraph RT [Router]
-        R1{Ada ticket ID?}
-        R2{Keyword cek tiket?}
-        R3{LLM classifier}
-        R1 -- Tidak --> R2
-        R2 -- Tidak --> R3
-    end
-
-    R1 -- Ya --> T1
-    R2 -- Ya --> T1
-    R3 -- ticket_status --> T1
-    R3 -- faq --> F1
-    R3 -- unknown --> U[Pesan di luar cakupan]
-
-    subgraph TC [Tool Call]
-        T1[Ekstrak ticket ID] --> T2[Lookup mock_tickets.csv]
-    end
-
-    subgraph RG [RAG]
-        F1[Embedding query] --> F2[FAISS top-3]
-        F2 --> F3{Skor >= 0.65?}
-        F3 -- Ya --> F4[Prompt + Gemini LLM]
-    end
-
-    F3 -- Tidak --> N[Jawaban: info tidak tersedia]
-    T2 --> Z[Response JSON: status, intent, data]
-    F4 --> Z
-    N --> Z
-    U --> Z
-    classDef default fill:#ffffff,stroke:#000000,stroke-width:1.5px,color:#000000
-    style RT fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
-    style TC fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
-    style RG fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
-    linkStyle default stroke:#000000,stroke-width:1.5px
-```
+<p align="center">
+  <img src="docs/workflow.svg" alt="Diagram workflow IT Helpdesk Assistant" width="760">
+</p>
 
 **Ringkasnya:** `query → validasi → intent detection (rule → keyword → LLM) → RAG atau tool call → response {status, intent, data}`.
 
@@ -177,7 +138,8 @@ it-helpdesk-assignment/
 │   └── test_scenarios.py   # Pengujian end-to-end /ask (8 skenario)
 ├── docs/
 │   ├── test_results_local.txt    # Output pengujian, dijalankan lokal
-│   └── test_results_docker.txt   # Output pengujian, dijalankan di container
+│   ├── test_results_docker.txt   # Output pengujian, dijalankan di container
+│   └── workflow.svg              # Diagram workflow
 ├── Dockerfile
 ├── .dockerignore        # .env, .venv, dll. tidak ikut masuk image
 ├── .env.example         # Template environment variables (tanpa key asli)
