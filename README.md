@@ -50,7 +50,7 @@ Tim People & IT Operations menerima ratusan pertanyaan repetitif setiap hari. Tu
 ## 2. Desain Workflow
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, Helvetica, sans-serif", "fontSize": "14px", "primaryColor": "#ffffff", "primaryTextColor": "#222222", "primaryBorderColor": "#555555", "lineColor": "#555555", "secondaryColor": "#ffffff", "tertiaryColor": "#f2f2f2", "clusterBkg": "#f2f2f2", "clusterBorder": "#bdbdbd", "edgeLabelBackground": "#ffffff"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontSize": "14px", "primaryColor": "#ffffff", "primaryTextColor": "#000000", "primaryBorderColor": "#000000", "lineColor": "#000000", "secondaryColor": "#ffffff", "tertiaryColor": "#f2f2f2", "clusterBkg": "#f2f2f2", "clusterBorder": "#000000", "edgeLabelBackground": "#ffffff"}, "themeCSS": ".node rect, .node polygon, .cluster rect { filter: none !important; } .edgeLabel { padding: 0 4px; }"}}%%
 flowchart TD
     A[POST /ask] --> B{Query valid?}
     B -- Tidak --> E1[Error 422]
@@ -85,6 +85,11 @@ flowchart TD
     F4 --> Z
     N --> Z
     U --> Z
+    classDef default fill:#ffffff,stroke:#000000,stroke-width:1.5px,color:#000000
+    style RT fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
+    style TC fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
+    style RG fill:#f2f2f2,stroke:#000000,stroke-width:1.5px
+    linkStyle default stroke:#000000,stroke-width:1.5px
 ```
 
 **Ringkasnya:** `query → validasi → intent detection (rule → keyword → LLM) → RAG atau tool call → response {status, intent, data}`.
