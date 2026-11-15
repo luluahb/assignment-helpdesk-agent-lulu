@@ -7,8 +7,6 @@ Backend API **FastAPI** untuk asisten AI internal tim People & IT Operations. Sa
 
 Aplikasi dikemas dalam **Docker**, dan API key dikelola lewat **environment variables**.
 
-> Assignment 4, AI Engineering Bootcamp ReWork: *End-to-End RAG & AI Agent Development*
-
 ---
 
 ## Daftar Isi
